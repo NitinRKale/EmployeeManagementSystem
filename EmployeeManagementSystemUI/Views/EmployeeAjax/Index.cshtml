@@ -1,0 +1,95 @@
+﻿@model IEnumerable<EmployeeManagementSystemUI.Models.EmployeeMaster>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+
+<div class="table-responsive">
+    <table id="jqtblEmployee" class="table table-bordered table-hover" style="width:100%">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Middle Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Birth Date</th>
+            <th>Gender</th>
+            <th>Phone Number</th>
+            <th>Address</th>
+            <th>Salary</th>
+            <th>Status</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</div>
+
+@section Scripts {
+
+     <style>
+        /* prevent wrapping so horizontal scrollbar appears instead */
+        #jqtblEmployee th,
+        #jqtblEmployee td {
+            white-space: nowrap;
+        }
+
+        /* ensure datatable wrapper uses full width */
+        .dataTables_wrapper {
+            width: 100%;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            $('#jqtblEmployee').DataTable({
+                "ajax": {
+                    "url": "/EmployeeAjax/GetAllEmployees",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "empFirstName" },
+                    { "data": "empMiddleName" },
+                    { "data": "empLastName" },
+                    { "data": "emailId" },
+                    { "data": "birthDate" },
+                    { "data": "empGender" },
+                    { "data": "phoneNumber" },  
+                    { "data": "employeeAddress" },
+                    { "data": "salary" },
+                    { "data": "empStatus" },
+                    { "data": "department" },
+                    { "data": "designation" },
+                    {
+                        "data": "empId",
+                        "render": function (data, type, row) {
+                            return `
+                                <a href="/EmployeeAjax/Edit/${data}" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="/EmployeeAjax/Details/${data}" class="btn btn-info btn-sm">Details</a>
+                                <a href="/EmployeeAjax/Delete/${data}" class="btn btn-danger btn-sm">Delete</a>
+                            `;
+                        },
+                        "paging": true,
+                        "lengthChange": false,
+                        "searching": true,
+                        "ordering": true,
+                        "info": true,
+                        "autoWidth": false,
+                        "responsive": false,  // turn off responsive column collapsing
+                        "scrollX": true       // enable horizontal scrolling
+                    }
+                ]
+            });
+        });
+    </script>
+}

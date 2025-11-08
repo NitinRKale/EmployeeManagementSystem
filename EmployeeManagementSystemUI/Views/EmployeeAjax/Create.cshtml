@@ -1,0 +1,134 @@
+﻿@model EmployeeManagementSystemUI.Models.EmployeeMaster
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="card card-success">
+    <div class="card-header">
+        <h3 class="card-title">Add Employee</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <form>
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="EmpFirstName" class="control-label"></label>
+                        <input asp-for="EmpFirstName" class="form-control" />
+                        <span asp-validation-for="EmpFirstName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EmpMiddleName" class="control-label"></label>
+                        <input asp-for="EmpMiddleName" class="form-control" />
+                        <span asp-validation-for="EmpMiddleName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EmpLastName" class="control-label"></label>
+                        <input asp-for="EmpLastName" class="form-control" />
+                        <span asp-validation-for="EmpLastName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EmailId" class="control-label"></label>
+                        <input asp-for="EmailId" class="form-control" />
+                        <span asp-validation-for="EmailId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="BirthDate" class="control-label"></label>
+
+                        <div class="input-group date" id="EmpBirthDate" data-target-input="nearest">
+                            <input asp-for="BirthDate" type="text"
+                                   class="form-control datetimepicker-input"
+                                   data-target="#EmpBirthDate" />
+                            <div class="input-group-append" data-target="#EmpBirthDate" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="BirthDate" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label asp-for="PhoneNumber" class="control-label"></label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <!-- /.col -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="EmployeeAddress" class="control-label"></label>
+                        <input asp-for="EmployeeAddress" class="form-control" />
+                        <span asp-validation-for="EmployeeAddress" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Salary" class="control-label"></label>
+                        <input asp-for="Salary" class="form-control" />
+                        <span asp-validation-for="Salary" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EmpGender" class="control-label">Gender</label>
+                        <input type="radio" class="radio radio-rounded" asp-for="EmpGender" value="Male" /> Male
+                        <input type="radio" class="radio radio-rounded" asp-for="EmpGender" value="Female" /> Female
+                        <span asp-validation-for="EmpGender" class="text-danger"></span>
+                    </div>
+                    <div class="form-group form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" asp-for="EmpStatus" /> @Html.DisplayNameFor(model => model.EmpStatus)
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="DepartmentId" class="control-label"></label>
+                        <select asp-for="DepartmentId" class="form-control">
+                            <option value="">--Select Department---</option>
+                            @foreach (var item in ViewBag.Departments)
+                            {
+                                <option value="@item.DepartmentId">@item.DepartmentName</option>
+                            }
+                        </select>
+                        <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="DesignationId" class="control-label"></label>
+                        <select asp-for="DesignationId" class="form-control">
+                            <option value="">--Select Designation---</option>
+                            @foreach (var item in ViewBag.Designations)
+                            {
+                                <option value="@item.DesignationId">@item.DesignationName</option>
+                            }
+                        </select>
+                        <span asp-validation-for="DesignationId" class="text-danger"></span>
+                    </div>
+                    <br />
+                    <div class="form-group">                       
+                        <input type="submit" id="btnSubmit" value="Create" class="btn btn-primary" />
+                        <a asp-action="Index" class="btn btn-info">Back to List</a>
+                    </div>
+                </div>
+                <!-- /.col -->
+            </div>
+        </form>
+        <!-- /.row -->
+    </div>
+</div>
+
+@section Scripts {
+   @*  <script src="~/js/employeecontrollerajax.js"></script> *@
+    <script src="~/js/EmployeeControllerAjaxHandler.js"></script>
+        
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

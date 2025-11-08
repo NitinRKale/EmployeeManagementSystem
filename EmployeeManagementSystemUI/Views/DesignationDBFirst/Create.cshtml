@@ -1,0 +1,23 @@
+﻿@model EmployeeManagementSystemUI.Models.DesignationMaster2
+
+@{
+    ViewData["Title"] = "Create Designation";
+}
+
+<h2>Create Designation</h2>
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="DesignationName" class="control-label"></label>
+        <input asp-for="DesignationName" class="form-control" />
+        <span asp-validation-for="DesignationName" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
