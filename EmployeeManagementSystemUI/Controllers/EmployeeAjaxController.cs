@@ -232,7 +232,7 @@ namespace EmployeeManagementSystemUI.Controllers
                         result = "Deleted",
                         message = "Employee deleted successfully.",
                         ErrorMessage = "",
-                        redirectTo = Url.Action("Index", "Employee")
+                        redirectTo = Url.Action("Index", "EmployeeAjax")
                     });
                 }
                 return Json(new { success = false, message = "Employee details was not found" });

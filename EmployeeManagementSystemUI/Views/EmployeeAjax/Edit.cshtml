@@ -1,4 +1,5 @@
-﻿@model EmployeeManagementSystemUI.Models.EmployeeMaster
+﻿
+@model EmployeeManagementSystemUI.Models.EmployeeMaster
 
 @{
     ViewData["Title"] = "Edit";
@@ -47,17 +48,22 @@
                     </div>
                     <div class="form-group">
                         <label asp-for="BirthDate" class="control-label"></label>
-
                         <div class="input-group date" id="EmpBirthDate" data-target-input="nearest">
-                            <input asp-for="BirthDate" type="text"
-                                   class="form-control datetimepicker-input"
-                                   data-target="#EmpBirthDate" />
+                            @* Render a consistent server-side format so the picker will parse it reliably *@
+                            @Html.TextBoxFor(model => model.BirthDate,
+                                "{0:dd-MM-yyyy}",
+                                new {
+                                    @class = "form-control datetimepicker-input",
+                                    data_target = "#EmpBirthDate",
+                                    autocomplete = "off"
+                                })
                             <div class="input-group-append" data-target="#EmpBirthDate" data-toggle="datetimepicker">
                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                             </div>
                         </div>
                         <span asp-validation-for="BirthDate" class="text-danger"></span>
-                    </div>
+                    </div>                                      
+
                     <div class="form-group">
                         <label asp-for="PhoneNumber" class="control-label"></label>
                         <input asp-for="PhoneNumber" class="form-control" />
@@ -122,9 +128,9 @@
     </div>
 </div>
 
+
 @section Scripts {
-    @*  <script src="~/js/employeecontrollerajax.js"></script> *@
-    <script src="~/js/EmployeeControllerAjaxHandler.js"></script>
+     <script src="~/js/EmployeeControllerNew.js"></script>
 
     <script>
         $(function () {
@@ -132,21 +138,54 @@
             $('input[name="EmpStatus"][type="checkbox"]').prop('checked', @(Model.EmpStatus.ToString().ToLower()));
         });
 
-
-        // Initialize the bootstrap datetimepicker for the edit form.
-        // Ensure the format matches the server-side asp-format used above ("MM/dd/yyyy" -> "MM/DD/YYYY" for picker).
+        // Improved datetimepicker init: set the input value BEFORE initializing the picker
         $(function () {
-            if ($.fn.datetimepicker) {
-                $('#EmpBirthDate').datetimepicker({
-                    format: 'MM/DD/YYYY'
-                });
+            if (!$.fn.datetimepicker) return;
 
-                // Defensive: if the server rendered a value but picker didn't parse it, re-set the input value explicitly.
-                var $input = $('input[name="BirthDate"]');
-                var serverVal = $input.val();
-                if (serverVal) {
-                    $input.val(serverVal);
+            var $picker = $('#EmpBirthDate');
+            var $input = $('input[name="BirthDate"]');
+
+            // Use the server-rendered attribute value (not .val()) so we read the original text Razor emitted
+            var serverVal = ($input.attr('value') || '').toString().trim();
+            var displayFormat = 'DD-MM-YYYY';
+            var parsedMoment = null;
+            var fallbackDate = null;
+
+            if (serverVal) {
+                if (window.moment) {
+                    // try strict parse first, then permissive fallback
+                    parsedMoment = moment(serverVal, ['DD-MM-YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', 'MM/DD/YYYY', moment.ISO_8601], true);
+                    if (!parsedMoment.isValid()) parsedMoment = moment(serverVal);
+                    if (parsedMoment.isValid()) {
+                        // set the input to the exact display format BEFORE initializing the picker
+                        $input.val(parsedMoment.format(displayFormat));
+                    } else {
+                        $input.val(serverVal);
+                    }
+                } else {
+                    // simple dd-mm-yyyy fallback
+                    var m = serverVal.match(/^\s*(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})\s*$/);
+                    if (m) {
+                        var day = m[1].padStart(2, '0'), month = m[2].padStart(2, '0'), year = m[3];
+                        $input.val(day + '-' + month + '-' + year);
+                        fallbackDate = new Date(year, month - 1, day);
+                    } else {
+                        $input.val(serverVal);
+                    }
                 }
+            }
+
+            // initialize the picker after input contains the formatted value
+            $picker.datetimepicker({
+                format: displayFormat,
+                useCurrent: false
+            });
+
+            // ensure the picker's internal date matches the input
+            if (parsedMoment && parsedMoment.isValid()) {
+                $picker.datetimepicker('date', parsedMoment);
+            } else if (fallbackDate) {
+                try { $picker.datetimepicker('date', fallbackDate); } catch (e) { /* ignore */ }
             }
         });
     </script>
