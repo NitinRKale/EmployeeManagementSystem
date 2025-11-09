@@ -5,6 +5,9 @@ namespace EmployeeManagementSystemUI.Models;
 
 public partial class EmployeeMaster2
 {
+    /// <summary>
+    /// this is just test attempt of creating pull request
+    /// </summary>
     public int EmpId { get; set; }
 
     public string EmpFirstName { get; set; } = null!;
