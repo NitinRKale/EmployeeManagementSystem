@@ -10,7 +10,12 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+   .AddJsonOptions(options =>
+    {
+        // A property naming policy, or null to leave property names unchanged.
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 
 
 // Register the DbContext with SQL Server using the connection string from appsettings.json

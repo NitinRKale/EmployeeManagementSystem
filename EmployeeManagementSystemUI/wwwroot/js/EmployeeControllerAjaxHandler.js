@@ -86,111 +86,115 @@ $(function () {
         // client-side validation
         if (!$form.valid()) return;
 
-        //// Build JS object from form fields
-        //var obj = {};
-        //$form.serializeArray().forEach(function (item) {
-        //    obj[item.name] = item.value;
-        //});
+        // Build JS object from form fields
+        var obj = {};
+        $form.serializeArray().forEach(function (item) {
+            obj[item.name] = item.value;
+        });
 
-        //// Ensure EmpStatus boolean is accurate
-        //obj.EmpStatus = $form.find('input[name="EmpStatus"]').is(':checked');
+        // Ensure EmpStatus boolean is accurate
+        obj.EmpStatus = $form.find('input[name="EmpStatus"]').is(':checked');
 
-        //// Normalize BirthDate to ISO (yyyy-MM-dd) so JSON model binder can parse it reliably.
-        //var bd = (obj.BirthDate || '').toString().trim();
-        //var isoDate = null;
-        //debugger;
-        //if (bd) {
-        //    if (window.moment) {
-        //        // try strict formats first, then a non-strict fallback
-        //        var formats = [
-        //            'YYYY-MM-DD',
-        //            'YYYY/MM/DD',
-        //            'DD-MM-YYYY',
-        //            'DD/MM/YYYY',
-        //            'MM-DD-YYYY',
-        //            'MM/DD/YYYY',
-        //            moment.ISO_8601
-        //        ];
-        //        var m = moment(bd, formats, true);
-        //        if (!m.isValid()) {
-        //            // non-strict fallback (more permissive)
-        //            m = moment(bd);
-        //        }
-        //        if (m.isValid()) {
-        //            isoDate = m.format('YYYY-MM-DD');
-        //        } else {
-        //            // parsing failed: send the raw value rather than null to avoid losing the entered value
-        //            isoDate = bd;
-        //        }
-        //    } else {
-        //        // No moment: attempt simple regex-based conversions
-        //        var ymd = /^\s*(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})\s*$/; // yyyy-mm-dd or yyyy/mm/dd
-        //        var dmy = /^\s*(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})\s*$/; // dd-mm-yyyy or dd/mm/yyyy
-        //        var match;
-        //        if (ymd.test(bd)) {
-        //            match = bd.match(ymd);
-        //            isoDate = match[1] + '-' + match[2].padStart(2, '0') + '-' + match[3].padStart(2, '0');
-        //        } else if (dmy.test(bd)) {
-        //            match = bd.match(dmy);
-        //            isoDate = match[3] + '-' + match[2].padStart(2, '0') + '-' + match[1].padStart(2, '0');
-        //        } else {
-        //            // last-resort: keep original string so the server can attempt parsing
-        //            isoDate = bd;
-        //        }
-        //    }
-        //} else {
-        //    // empty input -> explicit null so server knows it's cleared
-        //    isoDate = null;
-        //}
-
-        //obj.BirthDate = isoDate; // now either "YYYY-MM-DD", original string, or null (if empty)
-
-        //// Ensure numeric fields are numbers
-        //if (obj.EmpId) obj.EmpId = parseInt(obj.EmpId, 10) || 0;
-        //if (obj.DepartmentId) obj.DepartmentId = parseInt(obj.DepartmentId, 10) || 0;
-        //if (obj.DesignationId) obj.DesignationId = parseInt(obj.DesignationId, 10) || 0;
-        //if (obj.Salary) obj.Salary = parseFloat(obj.Salary) || 0;
-
-        //// Anti-forgery token
-        //var token = $form.find('input[name="__RequestVerificationToken"]').val();
-
-        //$btn.prop('disabled', true);
-
-        // Convert form to object, ensuring checkbox and date are handled predictably
-        function formToObject($form) {
-            var obj = {};
-            $form.serializeArray().forEach(function (item) {
-                // normalize empty strings for date if needed
-                if (item.name === 'BirthDate') {
-                    obj[item.name] = item.value ? item.value : null;
-                } else {
-                    // handle repeated keys (arrays) if necessary
-                    if (obj.hasOwnProperty(item.name)) {
-                        if (!Array.isArray(obj[item.name])) obj[item.name] = [obj[item.name]];
-                        obj[item.name].push(item.value);
-                    } else {
-                        obj[item.name] = item.value;
-                    }
+        // Normalize BirthDate to ISO (yyyy-MM-dd) so JSON model binder can parse it reliably.
+        var bd = (obj.BirthDate || '').toString().trim();
+        var isoDate = null;
+        debugger;
+        if (bd) {
+            if (window.moment) {
+                // try strict formats first, then a non-strict fallback
+                var formats = [
+                    'YYYY-MM-DD',
+                    'YYYY/MM/DD',
+                    'DD-MM-YYYY',
+                    'DD/MM/YYYY',
+                    'MM-DD-YYYY',
+                    'MM/DD/YYYY',
+                    moment.ISO_8601
+                ];
+                var m = moment(bd, formats, true);
+                if (!m.isValid()) {
+                    // non-strict fallback (more permissive)
+                    m = moment(bd);
                 }
-            });
-
-            // Ensure EmpStatus exists (checkbox unchecked won't be in serialized array)
-            var $status = $form.find('input[name="EmpStatus"]');
-            if ($status.length) {
-                obj.EmpStatus = $status.is(':checked');
+                if (m.isValid()) {
+                    isoDate = m.format('YYYY-MM-DD');
+                } else {
+                    // parsing failed: send the raw value rather than null to avoid losing the entered value
+                    isoDate = bd;
+                }
+            } else {
+                // No moment: attempt simple regex-based conversions
+                var ymd = /^\s*(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})\s*$/; // yyyy-mm-dd or yyyy/mm/dd
+                var dmy = /^\s*(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})\s*$/; // dd-mm-yyyy or dd/mm/yyyy
+                var match;
+                if (ymd.test(bd)) {
+                    match = bd.match(ymd);
+                    isoDate = match[1] + '-' + match[2].padStart(2, '0') + '-' + match[3].padStart(2, '0');
+                } else if (dmy.test(bd)) {
+                    match = bd.match(dmy);
+                    isoDate = match[3] + '-' + match[2].padStart(2, '0') + '-' + match[1].padStart(2, '0');
+                } else {
+                    // last-resort: keep original string so the server can attempt parsing
+                    isoDate = bd;
+                }
             }
-
-            return obj;
+        } else {
+            // empty input -> explicit null so server knows it's cleared
+            isoDate = null;
         }
 
-        var payloadObj = formToObject($form);
-        var payload = $.param(payloadObj); // url-encode for application/x-www-form-urlencoded
+        obj.BirthDate = isoDate; // now either "YYYY-MM-DD", original string, or null (if empty)
 
-        // antiforgery token from the hidden input rendered by @Html.AntiForgeryToken()
+        // Ensure numeric fields are numbers
+        if (obj.EmpId) obj.EmpId = parseInt(obj.EmpId, 10) || 0;
+        if (obj.DepartmentId) obj.DepartmentId = parseInt(obj.DepartmentId, 10) || 0;
+        if (obj.DesignationId) obj.DesignationId = parseInt(obj.DesignationId, 10) || 0;
+        if (obj.Salary) obj.Salary = parseFloat(obj.Salary) || 0;
+
+        // Anti-forgery token
         var token = $form.find('input[name="__RequestVerificationToken"]').val();
 
-        // UI: disable button while request is in-flight
         $btn.prop('disabled', true);
+
+        // Convert form to object, ensuring checkbox and date are handled predictably
+
+
+
+
+        //function formToObject($form) {
+        //    var obj = {};
+        //    $form.serializeArray().forEach(function (item) {
+        //        // normalize empty strings for date if needed
+        //        if (item.name === 'BirthDate') {
+        //            obj[item.name] = item.value ? item.value : null;
+        //        } else {
+        //            // handle repeated keys (arrays) if necessary
+        //            if (obj.hasOwnProperty(item.name)) {
+        //                if (!Array.isArray(obj[item.name])) obj[item.name] = [obj[item.name]];
+        //                obj[item.name].push(item.value);
+        //            } else {
+        //                obj[item.name] = item.value;
+        //            }
+        //        }
+        //    });
+
+        //    // Ensure EmpStatus exists (checkbox unchecked won't be in serialized array)
+        //    var $status = $form.find('input[name="EmpStatus"]');
+        //    if ($status.length) {
+        //        obj.EmpStatus = $status.is(':checked');
+        //    }
+
+        //    return obj;
+        //}
+
+        //var payloadObj = formToObject($form);
+        //var payload = $.param(payloadObj); // url-encode for application/x-www-form-urlencoded
+
+        //// antiforgery token from the hidden input rendered by @Html.AntiForgeryToken()
+        //var token = $form.find('input[name="__RequestVerificationToken"]').val();
+
+        //// UI: disable button while request is in-flight
+        //$btn.prop('disabled', true);
 
 
         $.ajax({
